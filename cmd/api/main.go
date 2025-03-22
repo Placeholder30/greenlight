@@ -16,9 +16,12 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/placeholder30/greenlight/internal/data"
 	"github.com/placeholder30/greenlight/internal/mailer"
+	"github.com/placeholder30/greenlight/internal/vcs"
 )
 
-const version = "1.0.0"
+var (
+	version = vcs.Version()
+)
 
 type config struct {
 	port int
@@ -71,11 +74,11 @@ func main() {
 	flag.IntVar(&cfg.limiter.burst, "limiter-burst", 4, "Rate limiter maximum burst")
 	flag.BoolVar(&cfg.limiter.enabled, "limiter-enabled", true, "Enable rate limiter")
 
-	flag.StringVar(&cfg.smtp.host, "smtp-host", "sandbox.smtp.mailtrap.io", "SMTP host")
+	flag.StringVar(&cfg.smtp.host, "smtp-host", "", "SMTP host")
 	flag.IntVar(&cfg.smtp.port, "smtp-port", 2525, "SMTP port")
-	flag.StringVar(&cfg.smtp.username, "smtp-username", "fdc83e0bfa9ca2", "SMTP username")
-	flag.StringVar(&cfg.smtp.password, "smtp-password", "b6c04b128186bf", "SMTP password")
-	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "malik@gmail.com", "SMTP sender")
+	flag.StringVar(&cfg.smtp.username, "smtp-username", "", "SMTP username")
+	flag.StringVar(&cfg.smtp.password, "smtp-password", "", "SMTP password")
+	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "", "SMTP sender")
 
 	flag.Func("cors-trusted-origins", "Trusted CORS origins (space separated)", func(val string) error {
 		cfg.cors.trustedOrigins = strings.Fields(val)
@@ -126,7 +129,6 @@ func main() {
 			cfg.smtp.sender),
 	}
 
-	
 	err = app.serve()
 	if err != nil {
 		logger.Error(err.Error())
